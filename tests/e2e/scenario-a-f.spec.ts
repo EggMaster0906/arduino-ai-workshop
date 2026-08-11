@@ -52,6 +52,7 @@ void loop() { motor.write(90); }`);
 test.describe("最終驗收情境 A–F", () => {
   test("第二章流程圖會顯示，且 2-3 答對後可前往下一關", async ({ page }) => {
     await startAnonymousSession(page);
+    await expect(page.getByTestId("sidebar-prompt-builder")).toHaveAttribute("href", /#\/prompt\?task=servo-gate/);
 
     await openTeacherLevel(page, "2-2");
     await expect(page.getByTestId("diagram").locator("svg")).toBeVisible();

@@ -43,6 +43,13 @@ export function MainLayout({ course }: { course: Course }) {
             </li>
           })}</ul>
         </section>)}
+        <section className="sidebar-activity" aria-label="重點活動">
+          <p>重點活動</p>
+          <Link className="sidebar-activity-link" data-testid="sidebar-prompt-builder" to="/prompt?task=servo-gate">
+            <span aria-hidden="true">✦</span>
+            <span><strong>Prompt Builder</strong><small>直接開始五問需求拆解</small></span>
+          </Link>
+        </section>
         {!lessonProgressionLocked && <p className="testing-mode-note">測試模式：所有章節皆可直接開啟。</p>}
       </aside>
       <main id="main-content" className="main-content"><Outlet /></main>
