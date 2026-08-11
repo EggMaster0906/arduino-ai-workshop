@@ -29,20 +29,23 @@ export function MainLayout({ course }: { course: Course }) {
     <div className="workspace">
       <aside className="course-sidebar" aria-label="課程關卡">
         <p className="sidebar-title">課程章節</p>
-        {course.chapters.map((chapter) => <section key={chapter.id} className="chapter-nav">
-          <h2>{chapter.title}</h2>
-          <ul>{chapter.levels.map((level, index) => {
-            const complete = state?.completedLevels.includes(level.id)
-            const current = state?.currentLevelId === level.id
-            const unlocked = teacherMode || Boolean(state && canOpenLevel(course, state, level.id))
-            const target = `/course/${course.id}/level/${level.id}`
-            return <li key={level.id}>
-              {unlocked ? <NavLink to={target} className={({ isActive }) => `level-link ${isActive ? 'active' : ''}`} aria-current={location.pathname.includes(`/level/${level.id}`) ? 'step' : undefined}>
-                <span className={`level-status ${complete ? 'complete' : current ? 'current' : ''}`} aria-hidden="true">{complete ? '✓' : current ? '●' : '○'}</span><span><small>{String(index + 1).padStart(2, '0')}</small>{level.title}</span>
-              </NavLink> : <span className="level-link locked" aria-label={`${level.title} 尚未解鎖`}><span className="level-status" aria-hidden="true">○</span><span><small>{String(index + 1).padStart(2, '0')}</small>{level.title}</span></span>}
-            </li>
-          })}</ul>
-        </section>)}
+        <div className="sidebar-chapters">
+          {course.chapters.map((chapter) => <section key={chapter.id} className="chapter-nav">
+            <h2>{chapter.title}</h2>
+            <ul>{chapter.levels.map((level, index) => {
+              const complete = state?.completedLevels.includes(level.id)
+              const current = state?.currentLevelId === level.id
+              const unlocked = teacherMode || Boolean(state && canOpenLevel(course, state, level.id))
+              const target = `/course/${course.id}/level/${level.id}`
+              return <li key={level.id}>
+                {unlocked ? <NavLink to={target} className={({ isActive }) => `level-link ${isActive ? 'active' : ''}`} aria-current={location.pathname.includes(`/level/${level.id}`) ? 'step' : undefined}>
+                  <span className={`level-status ${complete ? 'complete' : current ? 'current' : ''}`} aria-hidden="true">{complete ? '✓' : current ? '●' : '○'}</span><span><small>{String(index + 1).padStart(2, '0')}</small>{level.title}</span>
+                </NavLink> : <span className="level-link locked" aria-label={`${level.title} 尚未解鎖`}><span className="level-status" aria-hidden="true">○</span><span><small>{String(index + 1).padStart(2, '0')}</small>{level.title}</span></span>}
+              </li>
+            })}</ul>
+          </section>)}
+        </div>
+        {!lessonProgressionLocked && <p className="testing-mode-note">測試模式：所有章節皆可直接開啟。</p>}
         <section className="sidebar-activity" aria-label="重點活動">
           <p>重點活動</p>
           <Link className="sidebar-activity-link" data-testid="sidebar-prompt-builder" to="/prompt?task=servo-gate">
@@ -50,7 +53,6 @@ export function MainLayout({ course }: { course: Course }) {
             <span><strong>Prompt Builder</strong><small>直接開始五問需求拆解</small></span>
           </Link>
         </section>
-        {!lessonProgressionLocked && <p className="testing-mode-note">測試模式：所有章節皆可直接開啟。</p>}
       </aside>
       <main id="main-content" className="main-content"><Outlet /></main>
     </div>
