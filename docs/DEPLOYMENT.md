@@ -3,8 +3,9 @@
 ## GitHub Pages 前端
 
 1. 將 Repository 的 Pages Source 設為 GitHub Actions。
-2. 在 Repository Variables 建立 `VITE_API_BASE_URL`，值為 Backend 的固定 HTTPS 網址。
-3. Push 到 `main` 後，由 `.github/workflows/deploy-pages.yml` 自動執行 typecheck、test、build 與部署。
+2. 若只需要教材與前端流程展示，不必設定 Variables；網站會使用 Mock Prompt Coach。
+3. 若要使用真正 Backend，建立 Repository Variables `VITE_MOCK_AI=false` 和 `VITE_API_BASE_URL`（Backend 的固定 HTTPS 網址）。
+4. Push 到 `main` 後，由 `.github/workflows/deploy-pages.yml` 自動執行 typecheck、test、build 與部署。
 
 Vite production base 會依 Repository 名稱設定為 `/<repo-name>/`，前端使用 HashRouter，重新整理不需要 404 fallback。
 

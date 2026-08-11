@@ -104,11 +104,11 @@ CodexProvider 必須：
 
 ## 部署
 
-- GitHub Pages：`.github/workflows/deploy-pages.yml`
+- GitHub Pages：`.github/workflows/deploy-pages.yml`（預設使用 Mock Prompt Coach，可直接作為前端功能展示）
 - Backend API contract：`docs/API.md`
 - Linux、HTTPS、Cloudflare Tunnel 與課堂前檢查：`docs/DEPLOYMENT.md`
 
-GitHub Pages 使用 HashRouter。Repository Variable `VITE_API_BASE_URL` 必須設定為固定的 Backend HTTPS 網址。
+GitHub Pages 使用 HashRouter。若要連接真正 Backend，請設定 Repository Variables `VITE_MOCK_AI=false` 與 `VITE_API_BASE_URL` 為固定的 Backend HTTPS 網址；未設定時會安全地使用 Mock Prompt Coach。
 
 ## 學生識別與進度
 
