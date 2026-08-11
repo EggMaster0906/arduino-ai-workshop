@@ -1,19 +1,13 @@
 import {
   buildArduinoPrompt,
-  codeResponseSchema,
-  debugResponseSchema,
   missingFieldSchema,
-  type CodeRequest,
-  type CodeResponse,
-  type DebugRequest,
-  type DebugResponse,
   type PromptCoachRequest,
   type PromptCoachResponse
 } from "@arduino-ai/shared";
 import { z } from "zod";
 import { ProviderError } from "../errors.js";
 import { withTimeout } from "../lib/timeout.js";
-import { buildCoachInstruction, buildCodeInstruction, buildDebugInstruction } from "../providers/prompt-builders.js";
+import { buildCoachInstruction } from "../providers/prompt-builders.js";
 import type { AIProvider } from "../providers/types.js";
 
 const coachAssessmentSchema = z
@@ -150,35 +144,5 @@ export class PromptCoachService {
       structuredRequirement,
       prompt: missingFields.length === 0 ? buildArduinoPrompt(structuredRequirement) : null
     };
-  }
-}
-
-export class CodingService {
-  public constructor(
-    private readonly provider: AIProvider,
-    private readonly timeoutMs: number
-  ) {}
-
-  public async generate(request: CodeRequest): Promise<CodeResponse> {
-    const response = await withTimeout(
-      this.provider.generate({ task: "code", prompt: buildCodeInstruction(request.prompt) }),
-      this.timeoutMs
-    );
-    return validateProviderResponse(codeResponseSchema, response);
-  }
-}
-
-export class DebugService {
-  public constructor(
-    private readonly provider: AIProvider,
-    private readonly timeoutMs: number
-  ) {}
-
-  public async debug(request: DebugRequest): Promise<DebugResponse> {
-    const response = await withTimeout(
-      this.provider.generate({ task: "debug", prompt: buildDebugInstruction(request) }),
-      this.timeoutMs
-    );
-    return validateProviderResponse(debugResponseSchema, response);
   }
 }

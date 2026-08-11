@@ -49,49 +49,9 @@ Response：
 }
 ```
 
-## Coding AI
+## 外部 AI 程式與 Debug
 
-```http
-POST /api/ai/code
-Content-Type: application/json
-```
-
-```json
-{
-  "prompt": "完整 Prompt",
-  "taskId": "servo-gate",
-  "anonymousSessionId": "optional-uuid"
-}
-```
-
-成功回傳：
-
-```json
-{
-  "message": "適合初學者的解釋",
-  "code": "#include <Servo.h>\n...",
-  "language": "cpp"
-}
-```
-
-## Debug AI
-
-```http
-POST /api/ai/debug
-Content-Type: application/json
-```
-
-Request 包含 `originalPrompt`、`code`、`problem`、`errorMessage`、`hardwareState` 與 `attemptedFixes`。
-
-成功回傳：
-
-```json
-{
-  "analysis": "可能原因分析",
-  "checks": ["先確認接地", "確認訊號線接腳"],
-  "suggestedCode": null
-}
-```
+Backend 不提供程式生成或 Debug AI endpoint。學生在瀏覽器複製 Prompt 到自己使用的生成式 AI，再將程式碼貼回學習區；Debug 頁面只在瀏覽器內整理 Debug Prompt 與固定檢查清單，不會呼叫 Backend。
 
 ## Generic error
 

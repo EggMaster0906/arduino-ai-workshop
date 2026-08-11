@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import type { Course } from '@arduino-ai/shared'
-import { AiRequestError, generateCode } from '../../lib/api'
 import { loadAiWork, saveAiWork } from '../../lib/storage'
 import { useStudent } from '../../hooks/useStudent'
 
@@ -14,23 +13,21 @@ export function CodingAiPage({ course }: { course: Course }) {
   const navigate = useNavigate()
   const { taskId } = useParams()
   const [work, setWork] = useState(() => loadAiWork())
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [externalCode, setExternalCode] = useState('')
+  const [externalCode, setExternalCode] = useState(() => loadAiWork()?.code ?? '')
+  const [copied, setCopied] = useState(false)
   const [result, setResult] = useState<'success' | 'mismatch' | 'compile-error' | 'no-response' | ''>('')
   if (!state) return <Navigate to="/" replace />
   if (!work?.prompt) return <Navigate to={`/prompt/${taskId ?? ''}`} replace />
   if (taskId && work.taskId !== taskId) return <Navigate to={`/prompt/${taskId}`} replace />
   const prompt = work.prompt
-  const askAi = async () => {
-    setLoading(true); setError('')
+  const copyPrompt = async () => {
     try {
-      const response = await generateCode({ taskId: work.taskId, prompt, anonymousSessionId: state.anonymousSessionId })
-      const next = { ...work, code: response.code, codeMessage: response.message }
-      saveAiWork(next); setWork(next); completeMatchingActivities(course, 'coding-ai', work.taskId, completeActivity)
-    } catch (cause) {
-      setError(cause instanceof AiRequestError ? cause.message : 'AI 目前沒有成功回覆。你填寫的資料不會消失，可以再次嘗試。')
-    } finally { setLoading(false) }
+      await navigator.clipboard.writeText(prompt)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1800)
+    } catch {
+      setCopied(false)
+    }
   }
   const saveExternalCode = () => {
     if (!externalCode.trim()) return
@@ -47,9 +44,9 @@ export function CodingAiPage({ course }: { course: Course }) {
       navigate(`/debug/${work.taskId}`)
     }
   }
-  return <section className="ai-page"><div className="ai-page-heading"><p className="eyebrow">Coding AI</p><h1>產生 Arduino 程式</h1><p>AI 產生的程式只是開始。請閱讀、Upload，並在真實 UNO 上測試它。</p></div>
-    {!work.code ? <section className="ask-ai-card"><h2>準備好了嗎？</h2><p>網站會將你確認過的 Prompt 交給後端的 Coding AI；模型與 API Key 都不會出現在瀏覽器中。</p><button data-testid="coding-ai-generate" type="button" className="primary-button" onClick={askAi} disabled={loading}>{loading ? 'AI 產生程式中…' : '請 AI 產生程式'}</button>{error && <p className="api-error" role="alert">{error}</p>}<details className="external-code"><summary>我已使用自己的 Coding AI</summary><p>把取得的 Arduino 程式貼回這裡，網站才能幫你記錄測試與 Debug。</p><textarea value={externalCode} onChange={(event) => setExternalCode(event.target.value)} rows={7} placeholder="貼上 Arduino 程式" /><button className="secondary-button" type="button" onClick={saveExternalCode} disabled={!externalCode.trim()}>儲存外部 AI 的程式</button></details></section> : <>
-      <section className="code-answer" data-testid="coding-ai-code"><h2>AI 的 Arduino 程式</h2><pre><code>{work.code}</code></pre></section><section className="ai-explanation" data-testid="coding-ai-explanation"><h2>AI 的說明</h2><p>{work.codeMessage}</p></section>
+  return <section className="ai-page"><div className="ai-page-heading"><p className="eyebrow">外部 AI 協作</p><h1>貼回 Arduino 程式</h1><p>網站不會呼叫內建 Coding AI。請使用你自己的生成式 AI 取得程式碼，再貼回這裡進行實機測試與學習紀錄。</p></div>
+    {!work.code ? <section className="ask-ai-card"><h2>從其他 AI 取得程式碼</h2><ol><li>複製已完成的 Prompt。</li><li>貼到你使用的 Coding AI、Gemini、ChatGPT 或 Copilot。</li><li>把 AI 回傳的 Arduino 程式碼貼到下方。</li></ol><button type="button" className="secondary-button" onClick={copyPrompt}>{copied ? '已複製 Prompt' : '再次複製 Prompt'}</button><div className="external-code"><label htmlFor="external-code-input">外部 AI 回傳的 Arduino 程式碼<textarea data-testid="external-code-input" id="external-code-input" value={externalCode} onChange={(event) => setExternalCode(event.target.value)} rows={12} placeholder="請貼上 Arduino 程式碼，例如：#include <Servo.h>" /></label><button data-testid="external-code-save" className="primary-button" type="button" onClick={saveExternalCode} disabled={!externalCode.trim()}>儲存程式並開始測試 →</button></div></section> : <>
+      <section className="code-answer" data-testid="external-code-preview"><h2>你貼回的 Arduino 程式</h2><pre><code>{work.code}</code></pre></section><section className="ai-explanation" data-testid="external-code-note"><h2>下一步</h2><p>{work.codeMessage}</p></section>
       <section className="hardware-task"><div className="hardware-icon" aria-hidden="true">🧪</div><div className="hardware-body"><p className="eyebrow">實際測試</p><h2>請到 Arduino IDE Upload 後再回來</h2><ol><li>先確認接線與程式內的腳位相同。</li><li>Upload 程式並觀察 Servo 與光敏電阻的反應。</li><li>選擇第一次測試結果。</li></ol><fieldset className="test-result"><legend>第一次測試結果如何？</legend>{[
         ['success', '完全成功'], ['mismatch', '可以執行，但效果不符合需求'], ['compile-error', 'Compile Error'], ['no-response', 'Upload 成功，但硬體沒有反應'],
       ].map(([id, label]) => <label key={id}><input data-testid={`test-result-${id}`} type="radio" name="test-result" value={id} checked={result === id} onChange={() => setResult(id as typeof result)} />{label}</label>)}</fieldset><button data-testid="test-result-continue" type="button" className="primary-button" onClick={continueWithTest} disabled={!result}>{result === 'success' ? '紀錄成功並回到課程' : '填寫 Debug 資訊 →'}</button></div></section>

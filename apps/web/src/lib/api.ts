@@ -1,11 +1,5 @@
 import {
-  codeResponseSchema,
-  debugResponseSchema,
   promptCoachResponseSchema,
-  type CodeRequest,
-  type CodeResponse,
-  type DebugRequest,
-  type DebugResponse,
   type PromptCoachRequest,
   type PromptCoachResponse,
 } from '@arduino-ai/shared'
@@ -67,35 +61,9 @@ function mockCoach(request: PromptCoachRequest): PromptCoachResponse {
   }
 }
 
-function mockCode(): CodeResponse {
-  return {
-    language: 'cpp',
-    message: '這是示範回覆。請先確認光敏電阻與 SG90 的接線，再 Upload 到 Arduino UNO 測試。程式會讀取 A0 的光線數值，將它轉成角度，並讓 Servo 移動。',
-    code: `#include <Servo.h>\n\nServo motor;\nconst int lightPin = A0;\nconst int servoPin = 9;\n\nvoid setup() {\n  Serial.begin(9600);\n  motor.attach(servoPin);\n}\n\nvoid loop() {\n  int lightValue = analogRead(lightPin);\n  int angle = map(lightValue, 0, 1023, 180, 0);\n  motor.write(angle);\n  Serial.println(angle);\n  delay(100);\n}`,
-  }
-}
-
-function mockDebug(): DebugResponse {
-  return {
-    analysis: '伺服馬達沒有反應時，先從供電、接地與訊號線開始確認，比起立刻重寫整份程式更有效。',
-    checks: ['確認 SG90 棕色／黑色線接 Arduino GND，且所有裝置共地。', '確認紅色線有穩定的 5V 電源；若供電不足，Servo 可能抖動或不動。', '確認橘色／黃色訊號線確實接到程式中設定的 D9。', '先用 motor.write(90) 的最小程式測試 Servo。'],
-    suggestedCode: null,
-  }
-}
-
 export async function coachPrompt(request: PromptCoachRequest) {
   if (useMockAi) return mockCoach(request)
   return post('/api/prompt/coach', request, (value) => promptCoachResponseSchema.safeParse(value))
-}
-
-export async function generateCode(request: CodeRequest) {
-  if (useMockAi) return mockCode()
-  return post('/api/ai/code', request, (value) => codeResponseSchema.safeParse(value))
-}
-
-export async function debugCode(request: DebugRequest) {
-  if (useMockAi) return mockDebug()
-  return post('/api/ai/debug', request, (value) => debugResponseSchema.safeParse(value))
 }
 
 export { apiBaseUrl }

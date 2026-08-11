@@ -1,4 +1,4 @@
-import type { CodeResponse, DebugResponse, PromptCoachResponse } from "@arduino-ai/shared";
+import type { PromptCoachResponse } from "@arduino-ai/shared";
 
 /** Fixed responses for development, visual regression and E2E tests. */
 export const promptCoachIncompleteServoGate: PromptCoachResponse = {
@@ -70,76 +70,6 @@ export const promptCoachIncompleteSmartShade: PromptCoachResponse = {
   prompt: null,
 };
 
-export const mockCodingAiSuccess: CodeResponse = {
-  language: "cpp",
-  message:
-    "這份程式先讀取 Serial Monitor 的文字，再依 OPEN 或 CLOSE 讓 Servo 移動。請確認訊號線真的接在 D9。",
-  code: `#include <Servo.h>
-
-Servo motor;
-const int servoPin = 9;
-
-void setup() {
-  Serial.begin(9600);
-  motor.attach(servoPin);
-  motor.write(0);
-}
-
-void loop() {
-  if (Serial.available() > 0) {
-    String command = Serial.readStringUntil('\\n');
-    command.trim();
-
-    if (command == "OPEN") {
-      motor.write(90);
-    } else if (command == "CLOSE") {
-      motor.write(0);
-    }
-  }
-}`,
-};
-
-export const mockCodingAiSmartShade: CodeResponse = {
-  language: "cpp",
-  message:
-    "這份範例把 A0 的光線讀值轉成 Servo 角度。最後兩個 map 參數決定亮暗時的方向，請依你實際讀到的數值確認。",
-  code: `#include <Servo.h>
-
-Servo motor;
-const int lightPin = A0;
-const int servoPin = 9;
-
-void setup() {
-  Serial.begin(9600);
-  motor.attach(servoPin);
-}
-
-void loop() {
-  int lightValue = analogRead(lightPin);
-  int angle = map(lightValue, 0, 1023, 180, 0);
-  angle = constrain(angle, 10, 170);
-  motor.write(angle);
-
-  Serial.print(lightValue);
-  Serial.print(" -> ");
-  Serial.println(angle);
-  delay(100);
-}`,
-};
-
-export const mockDebugServoNoMovement: DebugResponse = {
-  analysis:
-    "程式已 Compile 且 Upload 成功，先不要整份重寫。Servo 不動時，常見原因是供電／共地、訊號腳位或實際指令格式不一致。",
-  checks: [
-    "確認 Servo 的 GND 與 Arduino GND 共地，紅線接到穩定的 5V 電源。",
-    "確認橘色／黃色訊號線真的接在程式使用的 D9，而不是相鄰腳位。",
-    "在 Serial Monitor 選擇換行結尾，輸入大寫 OPEN 後觀察是否收到指令。",
-    "暫時在 setup() 寫 motor.write(90)，確認 Servo 與接線本身能動。",
-  ],
-  suggestedCode: `// 先放在 setup() 最後一行測試 Servo 與接線：
-motor.write(90);`,
-};
-
 export const mockTimeout = {
   code: "AI_TIMEOUT",
   message: "AI 目前沒有成功回覆。你填寫的資料不會消失，可以再次嘗試。",
@@ -150,8 +80,5 @@ export const arduinoAiIntroMockFixtures = {
   promptCoachIncompleteServoGate,
   promptCoachCompleteServoGate,
   promptCoachIncompleteSmartShade,
-  mockCodingAiSuccess,
-  mockCodingAiSmartShade,
-  mockDebugServoNoMovement,
   mockTimeout,
 } as const;

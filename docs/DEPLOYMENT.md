@@ -19,8 +19,6 @@ PORT=3000
 FRONTEND_ORIGIN=https://<username>.github.io
 AI_PROVIDER=mock
 PROMPT_COACH_PROVIDER=codex
-CODING_PROVIDER=codex
-DEBUG_PROVIDER=codex
 CODEX_MODEL=gpt-5.4-mini
 MAX_AI_CONCURRENCY=5
 AI_REQUEST_TIMEOUT_MS=60000
@@ -36,7 +34,7 @@ AI_REQUEST_TIMEOUT_MS=60000
 
 - `/health` 可透過 HTTPS 存取。
 - CORS 只允許正式 GitHub Pages Origin。
-- 30 位學生的 Mock AI 並行測試可完成。
+- 30 位學生的 Mock Prompt Coach 並行測試可完成。
 - 真實 Provider 的 timeout、queue 與錯誤訊息符合預期。
 - Linux 主機不會睡眠，Backend 與 Tunnel 能在重新開機後恢復。
 

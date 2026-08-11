@@ -134,7 +134,7 @@ describe("API routes", () => {
   it("returns a generic validation error without Zod internals", async () => {
     const response = await app.inject({
       method: "POST",
-      url: "/api/ai/code",
+      url: "/api/prompt/coach",
       payload: { taskId: "servo-gate" }
     });
 
@@ -147,33 +147,20 @@ describe("API routes", () => {
     });
   });
 
-  it("returns a beginner-friendly C++ code response and a bounded debug response", async () => {
+  it("does not expose built-in code generation or debug AI routes", async () => {
     const codeResponse = await app.inject({
       method: "POST",
       url: "/api/ai/code",
-      payload: {
-        taskId: "servo-gate",
-        anonymousSessionId: firstSession,
-        prompt: "請產生控制 SG90 的初學者程式。"
-      }
+      payload: {}
     });
     const debugResponse = await app.inject({
       method: "POST",
       url: "/api/ai/debug",
-      payload: {
-        originalPrompt: "控制 SG90",
-        code: "void setup() {}\nvoid loop() {}",
-        problem: "Compile 成功，但 Servo 不動",
-        errorMessage: "",
-        hardwareState: "訊號線接 D9",
-        attemptedFixes: "重新 Upload"
-      }
+      payload: {}
     });
 
-    expect(codeResponse.statusCode).toBe(200);
-    expect(codeResponse.json()).toMatchObject({ language: "cpp", code: expect.stringContaining("Servo") });
-    expect(debugResponse.statusCode).toBe(200);
-    expect(debugResponse.json().checks).toHaveLength(3);
+    expect(codeResponse.statusCode).toBe(404);
+    expect(debugResponse.statusCode).toBe(404);
   });
 
   it("hides malformed provider output behind a generic retry-safe error", async () => {
@@ -182,11 +169,11 @@ describe("API routes", () => {
 
     const response = await app.inject({
       method: "POST",
-      url: "/api/ai/code",
+      url: "/api/prompt/coach",
       payload: {
         taskId: "servo-gate",
         anonymousSessionId: firstSession,
-        prompt: "請產生控制 SG90 的初學者程式。"
+        requirements: completeRequirements
       }
     });
 

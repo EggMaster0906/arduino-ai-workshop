@@ -2,7 +2,7 @@ import { execFile } from "node:child_process";
 import { mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { ProviderError } from "../errors.js";
-import type { AIProvider, AiTask, ProviderRequest } from "./types.js";
+import type { AIProvider, ProviderRequest } from "./types.js";
 
 const ALLOWED_CODEX_MODELS = ["gpt-5.4-mini"] as const;
 const MAX_OUTPUT_BYTES = 32_768;
@@ -61,10 +61,8 @@ export interface CodexProviderOptions {
   executable?: string;
 }
 
-function schemaPathFor(task: AiTask): string {
-  const fileName =
-    task === "prompt-coach" ? "coach.schema.json" : task === "code" ? "code.schema.json" : "debug.schema.json";
-  return fileURLToPath(new URL(`./schemas/${fileName}`, import.meta.url));
+function coachSchemaPath(): string {
+  return fileURLToPath(new URL("./schemas/coach.schema.json", import.meta.url));
 }
 
 function parseStructuredOutput(stdout: string): unknown {
@@ -110,7 +108,7 @@ export class CodexProvider implements AIProvider {
         "--cd",
         this.options.workdir,
         "--output-schema",
-        schemaPathFor(request.task),
+        coachSchemaPath(),
         "--color",
         "never",
         "-"

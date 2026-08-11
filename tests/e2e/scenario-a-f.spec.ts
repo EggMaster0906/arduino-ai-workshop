@@ -33,11 +33,16 @@ async function buildServoGatePrompt(page: Page) {
   await expect(page).toHaveURL(/#\/preview/);
 }
 
-async function generateCode(page: Page) {
-  await page.getByTestId("use-built-in-coding-ai").click();
+async function pasteExternalCode(page: Page) {
+  await page.getByTestId("open-external-code-paste").click();
   await expect(page).toHaveURL(/#\/coding/);
-  await page.getByTestId("coding-ai-generate").click();
-  await expect(page.getByTestId("coding-ai-code")).toContainText("#include <Servo.h>");
+  await page.getByTestId("external-code-input").fill(`#include <Servo.h>
+
+Servo motor;
+void setup() { motor.attach(9); }
+void loop() { motor.write(90); }`);
+  await page.getByTestId("external-code-save").click();
+  await expect(page.getByTestId("external-code-preview")).toContainText("#include <Servo.h>");
 }
 
 test.describe("最終驗收情境 A–F", () => {
@@ -75,19 +80,19 @@ test.describe("最終驗收情境 A–F", () => {
     await expect(page.getByTestId("final-prompt")).toContainText("不要自行假設");
   });
 
-  test("Scenario C：學生確認 Prompt 後可取得 Arduino 程式與初學者說明", async ({ page }) => {
+  test("Scenario C：學生可將外部 AI 程式貼回學習區並進行實測", async ({ page }) => {
     await startAnonymousSession(page);
     await buildServoGatePrompt(page);
-    await generateCode(page);
+    await pasteExternalCode(page);
 
-    await expect(page.getByTestId("coding-ai-explanation")).toBeVisible();
+    await expect(page.getByTestId("external-code-note")).toBeVisible();
     await expect(page.getByRole("group", { name: "第一次測試結果如何？" })).toBeVisible();
   });
 
   test("Scenario D：Servo 不動時，Debug Flow 先給檢查順序而非整份重寫", async ({ page }) => {
     await startAnonymousSession(page);
     await buildServoGatePrompt(page);
-    await generateCode(page);
+    await pasteExternalCode(page);
     await page.getByTestId("test-result-no-response").check();
     await page.getByTestId("test-result-continue").click();
     await expect(page).toHaveURL(/#\/debug/);
@@ -98,7 +103,7 @@ test.describe("最終驗收情境 A–F", () => {
     await page.getByTestId("debug-submit").click();
 
     await expect(page.getByTestId("debug-checks")).toContainText("訊號線");
-    await expect(page.getByTestId("debug-result")).not.toContainText("整份重寫");
+    await expect(page.getByTestId("debug-result")).toContainText("給外部 AI 的 Debug Prompt");
   });
 
   test("Scenario E：重新整理後，匿名本機 Session、答案與進度仍保留", async ({ page }) => {

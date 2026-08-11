@@ -1,4 +1,4 @@
-export type AiTask = "prompt-coach" | "code" | "debug";
+export type AiTask = "prompt-coach";
 
 export interface ProviderRequest {
   task: AiTask;

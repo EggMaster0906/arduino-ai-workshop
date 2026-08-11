@@ -95,7 +95,7 @@ SG90 的訊號線接在 {{servoPin}}。
 
 我是 Arduino 初學者。請使用容易理解的方式回答；如果資訊仍不足，請指出缺少的資訊，不要自行假設。`,
   studentReminder:
-    "你可以使用網站內建 Coding AI，也可以複製最終 Prompt，貼到自己的 Coding AI 或 Gemini、ChatGPT、Copilot 等生成式 AI 對話中。",
+    "請複製最終 Prompt，貼到你自己的 Coding AI、Gemini、ChatGPT 或 Copilot 等生成式 AI 對話中，再將程式碼貼回學習區。",
 };
 
 export const smartShadePromptTask: PromptTaskWithGuidance = {

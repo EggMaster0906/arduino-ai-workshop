@@ -968,7 +968,9 @@ Prompt Coach
    ↓
 完整 Prompt
    ↓
-Coding AI
+學生使用的外部生成式 AI
+   ↓
+將程式碼貼回學習區
    ↓
 閱讀程式
    ↓
@@ -1103,14 +1105,14 @@ UNO 驗證
 - 最終 Prompt
 - Before / After 比較
 
-## 7. AI Coding Assistant
+## 7. 外部 AI 程式碼貼回
 
 負責：
 
-- 接收最終 Prompt
-- 回覆 Arduino 程式
-- 顯示程式碼
-- 提供適合初學者的解釋
+- 複製最終 Prompt 到學生自行使用的生成式 AI
+- 接收學生貼回的 Arduino 程式碼
+- 顯示程式碼並接續實機測試紀錄
+- 網站本身不呼叫程式生成模型
 
 ## 8. Debug Learning Flow
 
@@ -1121,7 +1123,7 @@ UNO 驗證
 - 錯誤訊息輸入
 - 實際硬體狀態
 - Debug Prompt 產生
-- 第二輪 AI 協作
+- 複製到外部 AI 進行第二輪協作
 
 ---
 

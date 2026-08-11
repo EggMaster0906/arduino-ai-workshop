@@ -934,9 +934,9 @@ SG90 的訊號線接在哪一個 Arduino 腳位？
             {
               type: "callout",
               tone: "important",
-              title: "你有兩條可用路徑",
+              title: "使用你自己的生成式 AI",
               content:
-                "可按「使用網站內建 Coding AI」，或按「複製 Prompt」後貼到你自己的 Coding AI、Gemini、ChatGPT、Copilot 等生成式 AI 對話。外部 AI 的登入與帳號由該服務決定，網站不會替你登入。",
+                "按「複製 Prompt」後，貼到你自己的 Coding AI、Gemini、ChatGPT 或 Copilot 等生成式 AI 對話，再將取得的 Arduino 程式碼貼回學習區。外部 AI 的登入與帳號由該服務決定，網站不會替你登入。",
             },
             { type: "question", exerciseId: "2-5-preview" },
           ],
@@ -959,8 +959,8 @@ SG90 的訊號線接在哪一個 Arduino 腳位？
             {
               id: "2-5:prompt-preview",
               type: "prompt-preview",
-              title: "確認並選擇 AI 使用路徑",
-              description: "確認 Before / After 後，可複製 Prompt 或準備使用網站內建 Coding AI。",
+              title: "確認並複製 Prompt",
+              description: "確認 Before / After 後，複製 Prompt 到自己使用的外部生成式 AI。",
               taskId: "servo-gate",
             },
           ],
@@ -1020,8 +1020,8 @@ SG90 的訊號線接在哪一個 Arduino 腳位？
             {
               id: "2-6:coding-ai",
               type: "coding-ai",
-              title: "取得 Arduino 程式與初學者解釋",
-              description: "使用網站內建 AI，或在外部 AI 取得回覆後貼回／記錄程式。",
+              title: "貼回外部 AI 的 Arduino 程式",
+              description: "在外部 AI 取得回覆後，將 Arduino 程式碼貼回學習區並記錄。",
               taskId: "servo-gate",
             },
             {
@@ -1082,7 +1082,7 @@ SG90 的訊號線接在哪一個 Arduino 腳位？
               id: "2-7:debug-report",
               type: "debug-report",
               title: "送出一份可重現的 Debug 回報",
-              description: "完成現象、錯誤訊息、接線與已嘗試事項，閱讀 AI 的檢查順序。",
+              description: "完成現象、錯誤訊息、接線與已嘗試事項，整理外部 AI 可用的 Debug Prompt。",
               taskId: "servo-gate",
             },
           ],
@@ -1112,7 +1112,7 @@ SG90 的訊號線接在哪一個 Arduino 腳位？
   A[理解亮暗需求] --> B[五問需求拆解]
   B --> C[Prompt Coach]
   C --> D[確認 Prompt]
-  D --> E[Coding AI]
+  D --> E[外部生成式 AI]
   E --> F[Arduino IDE 與 UNO 測試]
   F --> G{符合需求？}
   G -->|否| H[Debug]
@@ -1131,7 +1131,7 @@ SG90 的訊號線接在哪一個 Arduino 腳位？
               title: "🧪 最終實機測試",
               instructions: [
                 "完成 smart-shade 五問需求，確認腳位與亮暗邏輯。",
-                "讓 Prompt Coach 檢查，預覽最終 Prompt 後選擇內建或外部 Coding AI。",
+                "讓 Prompt Coach 檢查，預覽最終 Prompt 後複製到外部生成式 AI。",
                 "把程式放入 Arduino IDE、Upload，改變光線測試遮光板。",
                 "記錄完全成功或失敗現象；若失敗，使用 Debug Flow 後再測。",
               ],
@@ -1199,7 +1199,7 @@ SG90 的訊號線接在哪一個 Arduino 腳位？
               id: "2-final:coding-ai",
               type: "coding-ai",
               title: "取得並閱讀 AI 程式",
-              description: "使用內建 AI，或複製 Prompt 給外部生成式 AI。",
+              description: "複製 Prompt 給外部生成式 AI，再將程式碼貼回學習區。",
               taskId: "smart-shade",
             },
             {

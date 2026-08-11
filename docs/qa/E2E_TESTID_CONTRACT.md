@@ -8,8 +8,8 @@
 | 課程頁 | `lesson-page`、`complete-level`、`hardware-task-{levelId}` |
 | 題目 | `exercise-{exerciseId}`、選項 `exercise-{exerciseId}-option-{optionId}` |
 | Prompt Builder | `prompt-task-{taskId}`、`prompt-field-{fieldId}`、checkbox `prompt-field-hardware-{optionId}`、`prompt-coach-submit`、`prompt-clarification` |
-| Prompt Preview | `prompt-preview`、`structured-requirement`、`final-prompt`、`use-built-in-coding-ai` |
-| Coding AI／測試 | `coding-ai-generate`、`coding-ai-code`、`coding-ai-explanation`、`test-result-{resultId}`、`test-result-continue` |
+| Prompt Preview | `prompt-preview`、`structured-requirement`、`final-prompt`、`copy-prompt-external`、`open-external-code-paste` |
+| 外部 AI 程式貼回／測試 | `external-code-input`、`external-code-save`、`external-code-preview`、`external-code-note`、`test-result-{resultId}`、`test-result-continue` |
 | Debug | `debug-problem`、`debug-hardware-state`、`debug-attempted-fixes`、`debug-submit`、`debug-result`、`debug-checks` |
 
 補充契約：
@@ -17,5 +17,5 @@
 - Prompt Builder 要能由 `?task=servo-gate` 與 `?task=smart-shade` 選擇對應任務；沒有 query 時可使用預設任務。
 - `hardware` 的 `checkbox-group` 必須實作為真正的 checkbox，而不是 textarea。
 - `teacherMode=1` 用於教師／E2E 解鎖檢視；它不是安全邊界。HashRouter 目前可支援 `/?teacherMode=1#/course/...`。
-- E2E 使用 `VITE_MOCK_AI=true`，不得對外呼叫真實 API、CLI 或使用 API key。
+- E2E 使用 `VITE_MOCK_AI=true` 模擬 Prompt Coach，不得對外呼叫真實 API、CLI 或使用 API key。
 - 題目和功能按鈕仍必須有可理解的可及性名稱；test id 不是 label 的替代品。

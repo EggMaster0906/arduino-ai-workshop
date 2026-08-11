@@ -3,11 +3,7 @@ import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 import Fastify, { type FastifyInstance, type FastifyRequest } from "fastify";
 import {
-  codeRequestSchema,
-  debugRequestSchema,
   promptCoachRequestSchema,
-  type CodeRequest,
-  type DebugRequest,
   type PromptCoachRequest
 } from "@arduino-ai/shared";
 import { z } from "zod";
@@ -16,12 +12,10 @@ import { ApiError, ProviderError } from "./errors.js";
 import { ConcurrencyLimiter } from "./lib/concurrency-limiter.js";
 import { createProvider } from "./providers/factory.js";
 import type { AIProvider } from "./providers/types.js";
-import { CodingService, DebugService, PromptCoachService } from "./services/ai-service.js";
+import { PromptCoachService } from "./services/ai-service.js";
 
 interface Providers {
   promptCoach: AIProvider;
-  coding: AIProvider;
-  debug: AIProvider;
 }
 
 export interface AppOptions {
@@ -74,9 +68,7 @@ function errorCode(error: unknown): string | undefined {
 
 function makeProviders(config: ApiConfig, overrides: Partial<Providers>): Providers {
   return {
-    promptCoach: overrides.promptCoach ?? createProvider(config.providers.promptCoach, config),
-    coding: overrides.coding ?? createProvider(config.providers.coding, config),
-    debug: overrides.debug ?? createProvider(config.providers.debug, config)
+    promptCoach: overrides.promptCoach ?? createProvider(config.providers.promptCoach, config)
   };
 }
 
@@ -85,8 +77,6 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
   const providers = makeProviders(config, options.providers ?? {});
   const limiter = options.limiter ?? new ConcurrencyLimiter(config.maxAiConcurrency);
   const promptCoach = new PromptCoachService(providers.promptCoach, config.aiRequestTimeoutMs);
-  const coding = new CodingService(providers.coding, config.aiRequestTimeoutMs);
-  const debug = new DebugService(providers.debug, config.aiRequestTimeoutMs);
 
   const app = Fastify({
     logger: config.nodeEnv !== "test",
@@ -163,48 +153,6 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
     async (request) => {
       const body = parseBody<PromptCoachRequest>(promptCoachRequestSchema, request.body);
       const result = await limiter.tryRun(() => promptCoach.coach(body));
-      if (!result) {
-        throw new ApiError(503, "AI_BUSY", "AI 正在協助其他同學，請稍後再試。");
-      }
-      return result;
-    }
-  );
-
-  app.post(
-    "/api/ai/code",
-    {
-      config: {
-        rateLimit: {
-          max: config.rateLimits.coding,
-          timeWindow: "1 minute",
-          keyGenerator: sessionRateKey
-        }
-      }
-    },
-    async (request) => {
-      const body = parseBody<CodeRequest>(codeRequestSchema, request.body);
-      const result = await limiter.tryRun(() => coding.generate(body));
-      if (!result) {
-        throw new ApiError(503, "AI_BUSY", "AI 正在協助其他同學，請稍後再試。");
-      }
-      return result;
-    }
-  );
-
-  app.post(
-    "/api/ai/debug",
-    {
-      config: {
-        rateLimit: {
-          max: config.rateLimits.debug,
-          timeWindow: "1 minute",
-          keyGenerator: sessionRateKey
-        }
-      }
-    },
-    async (request) => {
-      const body = parseBody<DebugRequest>(debugRequestSchema, request.body);
-      const result = await limiter.tryRun(() => debug.debug(body));
       if (!result) {
         throw new ApiError(503, "AI_BUSY", "AI 正在協助其他同學，請稍後再試。");
       }

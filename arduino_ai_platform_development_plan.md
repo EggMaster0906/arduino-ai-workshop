@@ -25,8 +25,8 @@
 - 使用「五問需求拆解法」建立開發需求
 - 由後端 Prompt Coach 協助檢查與整理需求
 - 生成最終 Prompt
-- 將 Prompt 送給 Coding AI
-- 取得 Arduino 程式與解釋
+- 複製 Prompt 到學生自行使用的外部生成式 AI
+- 將外部 AI 回傳的 Arduino 程式碼貼回學習區
 - 根據實際測試結果進行 Debug
 - 完成最終 AI 協作挑戰
 
@@ -110,11 +110,11 @@ AI
 Debug
 ```
 
-學生必須先整理需求，再真正將 Prompt 交給 Coding AI。
+學生必須先整理需求，再真正將 Prompt 交給自己使用的外部生成式 AI。
 
 學生會使用自己的Coding AI，或是將完成的 Prompt 複製貼上到生成式AI的對話中（如Gemini、ChatGPT、Copilot）
 
-網站內建的 Coding AI 是其中一種可用路徑，不應限制學生只能使用單一 AI 服務。
+網站不提供內建程式生成或 Debug AI，以避免消耗平台擁有者的個人 Codex 使用量；只保留 Prompt Coach 的資訊完整性檢查。學生取得外部 AI 回覆後，將程式碼貼回網站繼續測試與紀錄。
 
 ---
 
@@ -160,7 +160,7 @@ GitHub Pages Frontend
         ↓ HTTPS API
 Linux Backend
         ↓
-Prompt Coach / Coding AI
+Prompt Coach
         ↓
 Codex CLI
 ```
@@ -172,9 +172,9 @@ Codex CLI
 - 暴露 API Key
 - 暴露任何 Server Credential
 
-所有 AI 相關操作只能透過 Backend API。
+只有 Prompt Coach 會透過 Backend API 呼叫模型。程式生成與 Debug 由學生自行使用外部生成式 AI，網站不得代為呼叫。
 
-第一版內建 AI 所使用的模型固定為：
+第一版 Prompt Coach 所使用的模型固定為：
 
 ```text
 GPT-5.4 mini
@@ -963,7 +963,7 @@ Template 建議：
 
 # 18. Prompt Preview
 
-Prompt Coach 完成後，不應立刻送 Coding AI。
+Prompt Coach 完成後，不應立刻送到外部生成式 AI。
 
 先顯示：
 
@@ -996,75 +996,37 @@ AI 任務
 
 - 複製 Prompt
 - 返回修改
-- 使用網站內建 Coding AI
-- 使用自己的 Coding AI，或複製後貼到 Gemini、ChatGPT、Copilot 等生成式 AI
+- 前往「貼回外部 AI 程式碼」頁面
 
-只有學生主動選擇網站內建 Coding AI 後，Backend 才能代為送出 Prompt。若選擇外部 AI，網站只負責複製 Prompt，不得自動開啟帳號權限或代替學生登入第三方服務。
-
----
-
-# 19. Coding AI
-
-第二個 AI Layer。
-
-API：
-
-```http
-POST /api/ai/code
-```
-
-Request：
-
-```json
-{
-  "prompt": "...",
-  "taskId": "servo-gate"
-}
-```
-
-Response：
-
-```json
-{
-  "message": "...",
-  "code": "...",
-  "language": "cpp"
-}
-```
-
-Coding AI 回覆應偏初學者：
-
-- 先提供程式
-- 再逐段說明
-- 避免過度進階語法
-- 除非必要，不使用 class、pointer、template 等內容
+網站只負責複製 Prompt，不得代為呼叫程式生成模型、自動開啟帳號權限或代替學生登入第三方服務。
 
 ---
 
-# 20. Coding AI Prompt Policy
+# 19. 外部 AI 程式碼貼回
 
-Backend 應加入固定 system instruction，例如：
+網站不提供 Coding AI API。學生完成 Prompt 後：
 
-```text
-你是一位 Arduino 初學者程式助教。
+1. 複製 Prompt 到自己使用的 Coding AI、Gemini、ChatGPT 或 Copilot。
+2. 從外部 AI 取得 Arduino 程式碼。
+3. 回到學習區貼上程式碼。
+4. 網站以 `localStorage` 保存程式碼，接續 Arduino IDE 實測與 Debug 紀錄。
 
-學生是國中生。
+外部 AI 帳號、登入與使用量由學生選用的服務自行管理。
 
-請：
-1. 優先使用簡單 Arduino C++。
-2. 使用學生目前已學過的語法。
-3. 若使用新的語法，必須簡單解釋。
-4. 不要自行假設不存在的硬體或 Pin。
-5. 如果需求不足，先指出缺少資訊。
-6. 程式需適合 Arduino UNO。
-7. 回覆內容以容易理解為主。
-```
+---
+
+# 20. Token 使用政策
+
+- Backend 只允許 Prompt Coach 呼叫 CodexProvider。
+- 不提供 `/api/ai/code` 或 `/api/ai/debug`。
+- Prompt Coach 先執行 deterministic validation；只有基本資料完整時才呼叫模型進行最後檢查。
+- 開發、測試與 E2E 一律使用 Mock Prompt Coach，不得呼叫真實模型。
 
 ---
 
 # 21. Debug Flow
 
-AI 程式顯示後，網站提供：
+學生貼回外部 AI 程式後，網站提供：
 
 > 實際測試結果
 
@@ -1093,32 +1055,17 @@ AI 程式顯示後，網站提供：
 
 ---
 
-# 22. Debug API
+# 22. Debug Prompt
 
-```http
-POST /api/ai/debug
-```
+Debug 頁面在瀏覽器內將原始 Prompt、程式碼、問題現象、錯誤訊息、接線與已嘗試事項整理成可複製的 Debug Prompt，不呼叫 Backend。
 
-Request：
+網站同時提供固定檢查順序：
 
-```json
-{
-  "originalPrompt": "...",
-  "code": "...",
-  "problem": "...",
-  "errorMessage": "...",
-  "hardwareState": "...",
-  "attemptedFixes": "..."
-}
-```
-
-AI 回覆原則：
-
-1. 先分析可能原因
-2. 不要立即整份重寫
-3. 優先給檢查順序
-4. 每次最多列 3–5 個最可能原因
-5. 若需要修改程式，清楚指出修改位置
+1. 辨識 Compile、Upload 或執行結果問題
+2. 確認腳位、供電與共地
+3. 確認 Arduino IDE 開發板與 Port
+4. 使用最小測試程式分離問題
+5. 每次只修改一項並記錄結果
 
 ---
 
@@ -1151,7 +1098,9 @@ Prompt Coach
  ↓
 Prompt Preview
  ↓
-Coding AI
+外部生成式 AI
+ ↓
+貼回程式碼
  ↓
 Arduino IDE
  ↓
@@ -1358,8 +1307,6 @@ AntigravityProvider
 
 ```env
 PROMPT_COACH_PROVIDER=codex
-CODING_PROVIDER=codex
-DEBUG_PROVIDER=codex
 
 CODEX_MODEL=gpt-5.4-mini
 ```
@@ -1397,7 +1344,7 @@ AI Task 應：
 - 設 Timeout
 - 設 maximum output
 - 不允許 tool 去修改 Server 專案
-- Prompt Coach / Coding AI 不應擁有 filesystem write 權限
+- Prompt Coach 不應擁有 filesystem write 權限
 
 若 CLI 支援 sandbox / read-only mode，應啟用。
 
@@ -1586,8 +1533,6 @@ PORT=3000
 FRONTEND_ORIGIN=https://username.github.io
 
 PROMPT_COACH_PROVIDER=codex
-CODING_PROVIDER=codex
-DEBUG_PROVIDER=codex
 
 CODEX_MODEL=gpt-5.4-mini
 
@@ -1816,8 +1761,6 @@ Endpoint：
 ```text
 GET  /health
 POST /api/prompt/coach
-POST /api/ai/code
-POST /api/ai/debug
 ```
 
 ---
@@ -1844,7 +1787,8 @@ Prompt Builder
 → Coach
 → Clarification
 → Preview
-→ Coding AI
+→ 外部生成式 AI
+→ 貼回程式碼
 → Test Result
 → Debug
 ```
@@ -1890,15 +1834,13 @@ Prompt Builder
 - 第二章完整
 - Progress 可儲存
 - Prompt Builder 可用
-- AI 回覆可顯示
+- Prompt Coach 回覆與外部 AI 程式碼貼回可用
 - Debug flow 可用
 
 ### Backend
 
 - HTTPS 可存取
 - Prompt Coach
-- Coding AI
-- Debug AI
 - Rate limit
 - CLI timeout
 - Provider abstraction
@@ -1917,7 +1859,7 @@ Prompt Builder
 - GitHub 帳號
 - 安裝 Node
 - 登入網站或持有網站帳號
-- 登入 AI（使用網站內建 AI 時）；若學生自行選擇外部 AI，是否需要登入由該服務決定
+- 網站的 AI 帳號；學生使用外部 AI 時，是否需要登入由該服務決定
 - SSH
 - API Key
 
@@ -2057,8 +1999,8 @@ npm run build
 10. Build Mock Provider
 11. Connect frontend/backend
 12. Implement Prompt Coach
-13. Implement Coding AI
-14. Implement Debug flow
+13. Implement external AI code paste-back
+14. Implement local Debug Prompt flow
 15. Implement CLI providers
 16. Implement Chapter 2
 17. Add tests
@@ -2115,15 +2057,16 @@ CLOSE 關閉
 
 ---
 
-## Scenario C：Coding AI
+## Scenario C：外部 AI 程式碼貼回
 
 學生：
 
 ```text
 確認 Prompt
-→ 問 AI
+→ 複製到外部 AI
 → 得到 Arduino Code
-→ 得到簡單解釋
+→ 貼回學習區
+→ 進行實機測試
 ```
 
 ---
@@ -2194,9 +2137,7 @@ AI：
 │               Linux Backend                 │
 │                                             │
 │ API                                         │
-│ ├── Prompt Coach                           │
-│ ├── Coding AI                              │
-│ └── Debug AI                               │
+│ └── Prompt Coach                           │
 │                                             │
 │ Provider Layer                             │
 │ ├── Codex CLI                              │

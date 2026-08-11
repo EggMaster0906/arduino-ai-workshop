@@ -45,7 +45,7 @@
 - Main Layout、首頁、關卡導覽與 Progress UI。
 - Lesson Renderer、題型、Hardware Task 與可及性。
 - 匿名本機 Session、localStorage schema 與 reset UX。
-- Prompt Builder、Prompt Preview、Coding AI 與 Debug Flow 的前端畫面。
+- Prompt Builder、Prompt Preview、外部 AI 程式碼貼回與本機 Debug Prompt 的前端畫面。
 - 前端 unit/component tests。
 
 路徑所有權：
@@ -59,7 +59,7 @@ apps/web/
 主要責任：
 
 - Fastify／Express API、Zod validation 與 health check。
-- Prompt Coach、Coding AI、Debug API。
+- Prompt Coach API；不提供 Coding AI 或 Debug AI endpoint。
 - CORS、Helmet、rate limit、request limit、timeout 與 generic errors。
 - concurrency limiter、Mock Provider 與 CodexProvider。
 - 固定 `CODEX_MODEL=gpt-5.4-mini`，模型與 CLI argument 只接受後端 allowlist。

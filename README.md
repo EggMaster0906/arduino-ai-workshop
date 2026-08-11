@@ -1,6 +1,6 @@
 # Arduino × 生成式 AI 學習平台
 
-給國中生使用的 2 小時 Arduino 與生成式 AI 協作體驗課輔助系統。網站負責教材、關卡、Prompt Builder、AI 協作與 Debug 流程；Arduino IDE 與 UNO 負責實際編譯、上傳及硬體驗證。
+給國中生使用的 2 小時 Arduino 與生成式 AI 協作體驗課輔助系統。網站負責教材、關卡、Prompt Builder、外部 AI 程式碼貼回與 Debug 紀錄；Arduino IDE 與 UNO 負責實際編譯、上傳及硬體驗證。
 
 ## 專案結構
 
@@ -29,7 +29,7 @@ docs/             API、部署與 QA 文件
 - npm 10 以上
 - Arduino IDE（學生實機操作時使用）
 - Arduino UNO、SG90、光敏電阻與固定電阻
-- Codex CLI（只有真實 CodexProvider 需要）
+- Codex CLI（只有真實 Prompt Coach 需要）
 
 ## 安裝
 
@@ -90,9 +90,9 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-## AI Provider
+## Prompt Coach Provider
 
-開發與 CI 使用 Mock Provider。正式課堂可設定 Prompt Coach、Coding、Debug 使用 CodexProvider；Provider selection、timeout、concurrency 與 rate limit 都由 Backend 環境變數控制。
+開發與 CI 使用 Mock Provider。正式課堂只讓 Prompt Coach 使用 CodexProvider；程式生成與 Debug 不會呼叫網站後端模型。Provider selection、timeout、concurrency 與 rate limit 都由 Backend 環境變數控制。
 
 CodexProvider 必須：
 

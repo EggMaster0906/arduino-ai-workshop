@@ -7,7 +7,7 @@
 - [ ] `VITE_API_BASE_URL` 指向固定 HTTPS 網域，不是臨時 IP 或會變動的 Tunnel URL。
 - [ ] Backend 的 CORS 僅允許正式前端 Origin；health endpoint 與 HTTPS 外部連線都已實測。
 - [ ] Backend 環境變數固定為 `CODEX_MODEL=gpt-5.4-mini`，模型不會由前端 Request 覆寫；正式課前已做 API key 模型 smoke test。
-- [ ] `VITE_MOCK_AI=true` 可以完成開發／E2E 流程；production build 不含 API key、CLI command、server path 或 stack trace。
+- [ ] `VITE_MOCK_AI=true` 可以完成 Prompt Coach 開發／E2E 流程；production build 不含 API key、CLI command、server path 或 stack trace。
 - [ ] 已準備 Arduino IDE、UNO Port 權限、USB 線、預接好的光敏電阻分壓電路與 Servo 接線圖。
 
 ## Scenario A｜Arduino 基礎
@@ -24,18 +24,18 @@
 - [ ] 補入實際接線 D9 後，顯示結構化需求與包含 D9 的最終 Prompt。
 - [ ] Coach 回覆不得直接輸出 Arduino 程式、增加不存在硬體，或改變學生未指定的行為。
 
-## Scenario C｜Coding AI
+## Scenario C｜外部 AI 程式碼貼回
 
 - [ ] Prompt Preview 清楚顯示原始需求、整理後需求、最終 Prompt。
 - [ ] 可複製 Prompt 至學生自己的 Coding AI，或貼到 Gemini、ChatGPT、Copilot 等外部服務；網站不代替學生登入外部服務。
-- [ ] 選擇內建 Coding AI 後，顯示 Arduino C++ 程式和適合初學者的說明。
-- [ ] 模型、API key 與後端路徑不會出現在瀏覽器畫面、網址或前端 bundle。
+- [ ] 可將外部 AI 回傳的 Arduino C++ 程式碼貼回學習區，接著記錄實機測試結果。
+- [ ] 網站沒有內建程式生成按鈕，Backend 也沒有程式生成 endpoint。
 
 ## Scenario D｜Debug
 
 - [ ] 對「Compile／Upload 成功但 Servo 不動」可填入現象、錯誤訊息、接線與已嘗試事項。
-- [ ] Debug AI 先給 3–5 個可執行的檢查順序（供電／共地、訊號腳位、指令格式等）。
-- [ ] Debug AI 不在沒有分析前整份重寫程式；若建議改碼，要指明修改位置。
+- [ ] Debug 頁面在瀏覽器內整理可複製到外部 AI 的 Debug Prompt。
+- [ ] Debug 頁面提供固定的檢查順序（供電／共地、訊號腳位、Arduino IDE 設定等），不呼叫後端模型。
 
 ## Scenario E｜Reload 與本機紀錄
 
@@ -52,6 +52,6 @@
 
 ## 壓力與無障礙
 
-- [ ] 以 Mock AI 模擬 30 位學生同時進入、重整、送 Prompt、要求程式與 Debug；檢查限流、併發限制與「稍後再試」訊息。
+- [ ] 以 Mock AI 模擬 30 位學生同時進入、重整與送出 Prompt；檢查限流、併發限制與「稍後再試」訊息。
 - [ ] Tab、Enter／Space 可操作按鈕與表單；所有欄位有 label、焦點狀態與足夠色彩對比。
 - [ ] 不只依賴顏色表示正確／錯誤／完成；程式碼字型大小在教室螢幕可閱讀。
