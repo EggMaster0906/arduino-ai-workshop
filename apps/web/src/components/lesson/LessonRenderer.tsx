@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import type { ContentBlock, Exercise, HardwareTask, Level } from '@arduino-ai/shared'
+import { isExerciseAnswerCorrect, type ContentBlock, type Exercise, type HardwareTask, type Level } from '@arduino-ai/shared'
 import { useStudent } from '../../hooks/useStudent'
 
 function MarkdownContent({ content }: { content: string }) {
@@ -29,14 +29,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const { state, answer } = useStudent()
   const value = state?.answers[exercise.id]
   const [touched, setTouched] = useState(false)
-  const isCorrect = (() => {
-    if (exercise.type === 'multiple-choice') return value === exercise.correctOptionId
-    if (exercise.type === 'fill-blank' && typeof value === 'string') {
-      const candidate = exercise.caseSensitive ? value.trim() : value.trim().toLowerCase()
-      return exercise.acceptedAnswers.some((accepted) => (exercise.caseSensitive ? accepted : accepted.toLowerCase()) === candidate)
-    }
-    return exercise.type === 'reflection' && typeof value === 'string' && value.trim().length >= (exercise.minimumLength ?? 1)
-  })()
+  const isCorrect = isExerciseAnswerCorrect(exercise, value)
   const hasValue = typeof value === 'string' ? value.trim().length > 0 : value !== undefined
 
   return <fieldset className="exercise-card" data-testid={`exercise-${exercise.id}`}>

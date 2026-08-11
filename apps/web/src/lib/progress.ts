@@ -1,4 +1,4 @@
-import type { Course, Level, StudentState } from '@arduino-ai/shared'
+import { isExerciseAnswerCorrect, type Course, type Level, type StudentState } from '@arduino-ai/shared'
 
 // 開發與課前測試預設可自由檢視所有章節。正式上課時，設定
 // VITE_LOCK_LESSON_PROGRESSION=true 即可恢復依序解鎖。
@@ -27,13 +27,7 @@ export function getPreviousLevel(course: Course, levelId: string) {
 function isAnswerComplete(level: Level, answerId: string, answer: unknown) {
   const exercise = level.exercises?.find((item) => item.id === answerId)
   if (!exercise) return false
-  if (exercise.type === 'multiple-choice') return answer === exercise.correctOptionId
-  if (exercise.type === 'fill-blank') {
-    if (typeof answer !== 'string') return false
-    const normalized = exercise.caseSensitive ? answer.trim() : answer.trim().toLowerCase()
-    return exercise.acceptedAnswers.some((accepted) => (exercise.caseSensitive ? accepted : accepted.toLowerCase()) === normalized)
-  }
-  return typeof answer === 'string' && answer.trim().length >= (exercise.minimumLength ?? 1)
+  return isExerciseAnswerCorrect(exercise, answer)
 }
 
 export function canCompleteLevel(level: Level, state: StudentState) {
