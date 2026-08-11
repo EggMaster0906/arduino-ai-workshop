@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { isExerciseAnswerCorrect, type ContentBlock, type Exercise, type HardwareTask, type Level } from '@arduino-ai/shared'
@@ -6,6 +6,60 @@ import { useStudent } from '../../hooks/useStudent'
 
 function MarkdownContent({ content }: { content: string }) {
   return <div className="markdown-content"><ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown></div>
+}
+
+let mermaidPromise: Promise<(typeof import('mermaid'))['default']> | undefined
+
+function getMermaid() {
+  mermaidPromise ??= import('mermaid').then(({ default: mermaid }) => {
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#d6ebe7',
+        primaryTextColor: '#123b42',
+        primaryBorderColor: '#0b6a73',
+        lineColor: '#0b6a73',
+        secondaryColor: '#fff4d7',
+        tertiaryColor: '#f4fbf9',
+      },
+    })
+    return mermaid
+  })
+  return mermaidPromise
+}
+
+function Diagram({ title, content }: Extract<ContentBlock, { type: 'diagram' }>) {
+  const container = useRef<HTMLDivElement>(null)
+  const id = useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const renderDiagram = async () => {
+      try {
+        const mermaid = await getMermaid()
+        const { svg, bindFunctions } = await mermaid.render(`mermaid-${id}`, content)
+        if (cancelled || !container.current) return
+        container.current.innerHTML = svg
+        bindFunctions?.(container.current)
+      } catch {
+        if (!cancelled) setHasError(true)
+      }
+    }
+
+    void renderDiagram()
+    return () => { cancelled = true }
+  }, [content, id])
+
+  return <figure className="diagram" data-testid="diagram">
+    {title && <figcaption>{title}</figcaption>}
+    {hasError
+      ? <p className="diagram-error" role="status">流程圖暫時無法顯示，請重新整理後再試。</p>
+      : <div ref={container} className="mermaid-diagram" role="img" aria-label={title ?? '流程圖'} aria-busy />}
+  </figure>
 }
 
 function CodeBlock({ code, title, language }: Extract<ContentBlock, { type: 'code' }>) {
@@ -77,7 +131,7 @@ function ContentRenderer({ block, exercises }: { block: ContentBlock; exercises:
   if (block.type === 'markdown') return <MarkdownContent content={block.content} />
   if (block.type === 'code') return <CodeBlock {...block} />
   if (block.type === 'callout') return <aside className={`callout ${block.tone}`}><strong>{block.title ?? '重點'}</strong><MarkdownContent content={block.content} /></aside>
-  if (block.type === 'diagram') return <figure className="diagram"><figcaption>{block.title}</figcaption><div>{block.content}</div></figure>
+  if (block.type === 'diagram') return <Diagram {...block} />
   if (block.type === 'image') return <figure className="image-block"><img src={block.src} alt={block.alt} />{block.caption && <figcaption>{block.caption}</figcaption>}</figure>
   if (block.type === 'hardware-instruction') return <HardwareTaskCard levelId={`block-${block.title}`} task={block} />
   const exercise = exercises.find((item) => item.id === block.exerciseId)

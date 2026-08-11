@@ -46,6 +46,22 @@ void loop() { motor.write(90); }`);
 }
 
 test.describe("最終驗收情境 A–F", () => {
+  test("第二章流程圖會顯示，且 2-3 答對後可前往下一關", async ({ page }) => {
+    await startAnonymousSession(page);
+
+    for (const levelId of ["2-2", "2-3", "2-final"]) {
+      await openTeacherLevel(page, levelId);
+      const diagram = page.getByTestId("diagram");
+      await expect(diagram.locator("svg")).toBeVisible();
+    }
+
+    await openTeacherLevel(page, "2-3");
+    await page.getByTestId("exercise-2-3-role-option-ask").check();
+    await expect(page.getByTestId("complete-level")).toBeEnabled();
+    await page.getByTestId("complete-level").click();
+    await expect(page).toHaveURL(new RegExp(`#/course/${courseId}/level/2-4`));
+  });
+
   test("Scenario A：Arduino 基礎教材可由 1-0 走到 1-Final", async ({ page }) => {
     await startAnonymousSession(page);
 

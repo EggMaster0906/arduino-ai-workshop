@@ -13,6 +13,7 @@
   "dependencies": {
     "@arduino-ai/course-arduino-ai-intro": "*",
     "@arduino-ai/shared": "*",
+    "mermaid": "^11.16.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-markdown": "^10.1.0",

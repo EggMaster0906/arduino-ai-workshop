@@ -804,7 +804,6 @@ Servo 訊號接在 D9。
           ],
           completionRule: {
             requiredExerciseIds: ["2-2-logic"],
-            requiredActivityIds: ["2-2:prompt-builder"],
           },
         }),
         level({
@@ -863,7 +862,6 @@ Servo 訊號接在 D9。
           ],
           completionRule: {
             requiredExerciseIds: ["2-3-role"],
-            requiredActivityIds: ["2-3:prompt-coach"],
           },
         }),
         level({
