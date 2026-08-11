@@ -1435,7 +1435,7 @@ AI Task 應：
 
 ```text
 Prompt Coach：
-10 requests / minute / IP
+10 requests / minute / anonymous session（無合法 session ID 時才 fallback IP）
 
 Coding：
 5 requests / minute / session
@@ -1445,6 +1445,8 @@ Debug：
 ```
 
 實際限制可由 env 調整。
+
+注意：學校電腦可能透過同一個 NAT 共用公開 IP。若全部 endpoint 只依 IP 限流，會把整班誤判為單一使用者。因此課堂 API 應優先使用格式合法的 `anonymousSessionId` 作為 rate-limit key，缺少時才使用 IP；此 ID 只用於流量分組，不是登入或授權憑證。全域資源保護仍由 concurrency limiter、request limit、timeout 與反向代理共同負責。
 
 ---
 
