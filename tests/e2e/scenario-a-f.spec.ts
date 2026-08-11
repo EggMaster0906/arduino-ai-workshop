@@ -18,6 +18,11 @@ async function openTeacherLevel(page: Page, levelId: string) {
 async function buildServoGatePrompt(page: Page) {
   await page.goto("/#/prompt?task=servo-gate");
   await expect(page.getByTestId("prompt-task-servo-gate")).toBeVisible();
+  await submitServoGatePrompt(page);
+  await expect(page).toHaveURL(/#\/preview/);
+}
+
+async function submitServoGatePrompt(page: Page) {
   await page.getByTestId("prompt-field-goal").fill("做一個可以開關的簡易柵欄");
   await page.getByTestId("prompt-field-hardware-uno").check();
   await page.getByTestId("prompt-field-hardware-sg90").check();
@@ -30,7 +35,6 @@ async function buildServoGatePrompt(page: Page) {
   await expect(page.getByTestId("prompt-clarification")).toContainText("訊號線");
   await page.getByTestId("prompt-field-servoPin").fill("D9");
   await page.getByTestId("prompt-coach-submit").click();
-  await expect(page).toHaveURL(/#\/preview/);
 }
 
 async function pasteExternalCode(page: Page) {
@@ -49,17 +53,26 @@ test.describe("最終驗收情境 A–F", () => {
   test("第二章流程圖會顯示，且 2-3 答對後可前往下一關", async ({ page }) => {
     await startAnonymousSession(page);
 
-    for (const levelId of ["2-2", "2-3", "2-final"]) {
-      await openTeacherLevel(page, levelId);
-      const diagram = page.getByTestId("diagram");
-      await expect(diagram.locator("svg")).toBeVisible();
-    }
+    await openTeacherLevel(page, "2-2");
+    await expect(page.getByTestId("diagram").locator("svg")).toBeVisible();
+    await page.getByTestId("exercise-2-2-logic-option-logic").check();
+    await expect(page.getByTestId("complete-level")).toBeDisabled();
+    await page.getByRole("link", { name: "前往 Prompt Builder" }).click();
+    await expect(page.getByTestId("prompt-task-servo-gate")).toBeVisible();
+    await submitServoGatePrompt(page);
+    await expect(page).toHaveURL(new RegExp(`#/course/${courseId}/level/2-2`));
+    await expect(page.getByTestId("complete-level")).toBeEnabled();
+    await page.getByTestId("complete-level").click();
 
-    await openTeacherLevel(page, "2-3");
+    await expect(page).toHaveURL(new RegExp(`#/course/${courseId}/level/2-3`));
+    await expect(page.getByTestId("diagram").locator("svg")).toBeVisible();
     await page.getByTestId("exercise-2-3-role-option-ask").check();
     await expect(page.getByTestId("complete-level")).toBeEnabled();
     await page.getByTestId("complete-level").click();
     await expect(page).toHaveURL(new RegExp(`#/course/${courseId}/level/2-4`));
+
+    await openTeacherLevel(page, "2-final");
+    await expect(page.getByTestId("diagram").locator("svg")).toBeVisible();
   });
 
   test("Scenario A：Arduino 基礎教材可由 1-0 走到 1-Final", async ({ page }) => {

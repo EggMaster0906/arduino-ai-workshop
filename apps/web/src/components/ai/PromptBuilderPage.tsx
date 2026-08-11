@@ -14,7 +14,9 @@ export function PromptBuilderPage({ course, taskFor }: { course: Course; taskFor
   const navigate = useNavigate()
   const { taskId: taskIdParam } = useParams()
   const location = useLocation()
-  const taskId = new URLSearchParams(location.search).get('task') ?? taskIdParam
+  const searchParams = new URLSearchParams(location.search)
+  const taskId = searchParams.get('task') ?? taskIdParam
+  const returnLevelId = searchParams.get('returnLevel')
   const task = taskFor(taskId)
   const prior = useMemo(() => loadAiWork(), [])
   const [values, setValues] = useState<Record<string, string>>(() => Object.fromEntries(task.fields.map((field): [string, string] => {
@@ -49,7 +51,8 @@ export function PromptBuilderPage({ course, taskFor }: { course: Course; taskFor
       saveAiWork({ taskId: task.id, requirements: values, structuredRequirement: result.structuredRequirement, prompt: result.prompt })
       addPrompt({ taskId: task.id, rawRequirements: values, prompt: result.prompt })
       ;['prompt-builder', 'prompt-coach'].forEach((type) => activityIds(course, type, task.id).forEach(completeActivity))
-      navigate(`/preview/${task.id}`)
+      const returnLevel = course.chapters.flatMap((chapter) => chapter.levels).find((level) => level.id === returnLevelId && level.activities?.some((activity) => activity.type === 'prompt-builder' && activity.taskId === task.id))
+      navigate(returnLevel ? `/course/${course.id}/level/${returnLevel.id}` : `/preview/${task.id}`)
     } catch (cause) {
       setError(cause instanceof AiRequestError ? cause.message : 'AI 目前沒有成功回覆。你填寫的資料不會消失，可以再次嘗試。')
     } finally {
