@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import type { Course } from '@arduino-ai/shared'
-import { getProgress } from '../../lib/progress'
+import { canOpenLevel, getProgress, lessonProgressionLocked } from '../../lib/progress'
 import { useStudent } from '../../hooks/useStudent'
 
 export function MainLayout({ course }: { course: Course }) {
@@ -32,11 +32,9 @@ export function MainLayout({ course }: { course: Course }) {
         {course.chapters.map((chapter) => <section key={chapter.id} className="chapter-nav">
           <h2>{chapter.title}</h2>
           <ul>{chapter.levels.map((level, index) => {
-            const globallyIndexed = course.chapters.flatMap((item) => item.levels).findIndex((item) => item.id === level.id)
-            const prior = course.chapters.flatMap((item) => item.levels)[globallyIndexed - 1]
             const complete = state?.completedLevels.includes(level.id)
             const current = state?.currentLevelId === level.id
-            const unlocked = teacherMode || globallyIndexed === 0 || Boolean(prior && state?.completedLevels.includes(prior.id)) || complete || current
+            const unlocked = teacherMode || Boolean(state && canOpenLevel(course, state, level.id))
             const target = `/course/${course.id}/level/${level.id}`
             return <li key={level.id}>
               {unlocked ? <NavLink to={target} className={({ isActive }) => `level-link ${isActive ? 'active' : ''}`} aria-current={location.pathname.includes(`/level/${level.id}`) ? 'step' : undefined}>
@@ -45,6 +43,7 @@ export function MainLayout({ course }: { course: Course }) {
             </li>
           })}</ul>
         </section>)}
+        {!lessonProgressionLocked && <p className="testing-mode-note">測試模式：所有章節皆可直接開啟。</p>}
       </aside>
       <main id="main-content" className="main-content"><Outlet /></main>
     </div>

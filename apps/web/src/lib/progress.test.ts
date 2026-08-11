@@ -14,9 +14,9 @@ describe('關卡進度規則', () => {
     expect(canCompleteLevel(level, state)).toBe(true)
   })
 
-  it('線性解鎖只允許前一關完成後進入下一關，並正確計算總進度', () => {
+  it('測試模式可直接開啟所有關卡，並正確計算總進度', () => {
     const state = createStudentState({ displayName: '小安', courseId: arduinoAiIntroCourse.id, firstLevelId: '1-0' })
-    expect(canOpenLevel(arduinoAiIntroCourse, state, '1-1')).toBe(false)
+    expect(canOpenLevel(arduinoAiIntroCourse, state, '1-1')).toBe(true)
     state.completedLevels = ['1-0']
     expect(canOpenLevel(arduinoAiIntroCourse, state, '1-1')).toBe(true)
     expect(getProgress(arduinoAiIntroCourse, state)).toEqual({ completed: 1, total: 16, percentage: 6 })
