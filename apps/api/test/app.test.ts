@@ -101,6 +101,27 @@ describe("API routes", () => {
     });
   });
 
+  it("asks for a complete Servo control logic instead of accepting a vague statement", async () => {
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/prompt/coach",
+      payload: {
+        taskId: "servo-gate",
+        anonymousSessionId: firstSession,
+        requirements: { ...completeRequirements, logic: ["讓 Servo 控制柵欄"] }
+      }
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      complete: false,
+      missingFields: [
+        { field: "logic" }
+      ],
+      prompt: null
+    });
+  });
+
   it("accepts the newline-delimited fields and separate servo pin sent by the web Prompt Builder", async () => {
     const response = await app.inject({
       method: "POST",

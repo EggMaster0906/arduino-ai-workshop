@@ -108,6 +108,8 @@ test.describe("最終驗收情境 A–F", () => {
     await expect(page.getByTestId("prompt-preview")).toBeVisible();
     await expect(page.getByTestId("structured-requirement")).toContainText("D9");
     await expect(page.getByTestId("final-prompt")).toContainText("不要自行假設");
+    await expect(page.getByTestId("open-gemini")).toHaveAttribute("href", "https://gemini.google.com/app");
+    await expect(page.getByTestId("open-chatgpt")).toHaveAttribute("href", "https://chatgpt.com/");
   });
 
   test("Scenario C：學生可將外部 AI 程式貼回學習區並進行實測", async ({ page }) => {

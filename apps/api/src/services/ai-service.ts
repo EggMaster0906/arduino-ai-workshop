@@ -73,21 +73,44 @@ function basicMissingFields(requirement: ReturnType<typeof normalizeRequirement>
 
 function taskSpecificMissingFields(taskId: string, requirement: ReturnType<typeof normalizeRequirement>): MissingField[] {
   const requiresServoPin = new Set(["servo-gate", "smart-shade"]);
-  if (!requiresServoPin.has(taskId)) {
-    return [];
-  }
-
   const allDetails = [
     ...requirement.hardware,
     requirement.control,
     ...requirement.logic
   ].join(" ");
   const hasServo = /\b(?:sg90|servo)\b/i.test(allDetails);
-  const hasPin = /\b(?:d\s*)?(?:[0-9]|1[0-3])\b/i.test(allDetails);
+  const hasPin = /\bD\s*(?:[0-9]|1[0-3])\b/i.test(allDetails);
+  const logic = requirement.logic.join(" ");
+  const hasConditionToAction = /(?:→|=>|當|如果|若|時|對應|變成)/.test(logic);
+  const missing: MissingField[] = [];
 
-  return hasServo && !hasPin
-    ? [{ field: "servoPin", question: "SG90 的訊號線接在哪一個 Arduino 腳位？" }]
-    : [];
+  if (requiresServoPin.has(taskId) && hasServo && !hasPin) {
+    missing.push({ field: "servoPin", question: "SG90 的訊號線接在哪一個 Arduino 腳位？" });
+  }
+
+  if (taskId === "servo-gate") {
+    const hasOpenCase = /\bopen\b|打開|開啟/i.test(logic);
+    const hasCloseCase = /\bclose\b|關閉|關上/i.test(logic);
+    if (!hasOpenCase || !hasCloseCase || !hasConditionToAction) {
+      missing.push({
+        field: "logic",
+        question: "請分別寫出收到 OPEN 與 CLOSE 時，Servo 要轉到哪個角度或做什麼動作（例如 OPEN → 90°；CLOSE → 0°）。"
+      });
+    }
+  }
+
+  if (taskId === "smart-shade") {
+    const hasLightCondition = /亮|暗|光|數值/.test(logic);
+    const hasOutputAction = /servo|伺服|角度|度|打開|關閉|轉到/i.test(logic);
+    if (!hasLightCondition || !hasOutputAction || !hasConditionToAction) {
+      missing.push({
+        field: "logic",
+        question: "請寫出亮／暗（或感測數值）各自對應的 Servo 動作或角度，並標示條件與動作的關係。"
+      });
+    }
+  }
+
+  return missing;
 }
 
 function deDuplicateMissingFields(fields: MissingField[]): MissingField[] {
