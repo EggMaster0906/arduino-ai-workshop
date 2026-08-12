@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import type { Course } from '@arduino-ai/shared'
-import { canOpenLevel, getProgress, lessonProgressionLocked } from '../../lib/progress'
+import { canOpenLevel, getProgress } from '../../lib/progress'
 import { useStudent } from '../../hooks/useStudent'
 
 export function MainLayout({ course }: { course: Course }) {
@@ -45,7 +45,6 @@ export function MainLayout({ course }: { course: Course }) {
             })}</ul>
           </section>)}
         </div>
-        {!lessonProgressionLocked && <p className="testing-mode-note">測試模式：所有章節皆可直接開啟。</p>}
         <section className="sidebar-activity" aria-label="重點活動">
           <p>重點活動</p>
           <Link className="sidebar-activity-link" data-testid="sidebar-prompt-builder" to="/prompt?task=servo-gate">

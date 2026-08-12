@@ -61,7 +61,7 @@ npm run dev:api
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
-課前測試預設可直接開啟所有課程章節。正式上課若要恢復依序解鎖，請在前端環境變數設定 `VITE_LOCK_LESSON_PROGRESSION=true`。
+課程章節會依學習進度依序解鎖；完成前一關後，才能開啟下一關。
 
 Backend 請從 `apps/api/.env.example` 建立自己的 `.env`。第一版模型固定為：
 

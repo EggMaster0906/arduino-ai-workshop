@@ -1,9 +1,5 @@
 import { isExerciseAnswerCorrect, type Course, type Level, type StudentState } from '@arduino-ai/shared'
 
-// 開發與課前測試預設可自由檢視所有章節。正式上課時，設定
-// VITE_LOCK_LESSON_PROGRESSION=true 即可恢復依序解鎖。
-export const lessonProgressionLocked = import.meta.env.VITE_LOCK_LESSON_PROGRESSION === 'true'
-
 export function getLevels(course: Course) {
   return course.chapters.flatMap((chapter) => chapter.levels)
 }
@@ -45,7 +41,6 @@ export function getProgress(course: Course, state: StudentState | null) {
 }
 
 export function canOpenLevel(course: Course, state: StudentState, targetId: string) {
-  if (!lessonProgressionLocked) return true
   const levels = getLevels(course)
   const targetIndex = levels.findIndex((level) => level.id === targetId)
   if (targetIndex <= 0 || state.completedLevels.includes(targetId)) return true
