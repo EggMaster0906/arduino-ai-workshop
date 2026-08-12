@@ -8,10 +8,6 @@ export function createProvider(kind: "mock" | "codex", config: ApiConfig): AIPro
     return new MockProvider(config.mockScenario);
   }
 
-  if (!config.codex.apiKey) {
-    throw new Error("Codex Provider 缺少 CODEX_API_KEY。");
-  }
-
   return new CodexProvider({
     model: config.codex.model,
     apiKey: config.codex.apiKey,

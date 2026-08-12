@@ -82,7 +82,9 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
     logger: config.nodeEnv !== "test",
     bodyLimit: config.requestBodyLimitBytes,
     requestTimeout: config.requestTimeoutMs,
-    connectionTimeout: 10_000
+    // Codex may take up to AI_REQUEST_TIMEOUT_MS. Keep the client socket alive
+    // long enough to receive the mapped timeout or the provider response.
+    connectionTimeout: config.requestTimeoutMs + 5_000
   });
 
   await app.register(helmet);

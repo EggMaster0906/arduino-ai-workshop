@@ -40,9 +40,10 @@ npm run build --workspace @arduino-ai/api
 ```env
 PROMPT_COACH_PROVIDER=codex
 CODEX_MODEL=gpt-5.4-mini
+# 部署時由 secret store 注入；本機已 `codex login` 則可省略。
 CODEX_API_KEY=由部署環境的 secret store 注入
 ```
 
-Codex 模型是後端 allowlist 的唯一值；request 無法傳入模型或 CLI 參數。每次呼叫均使用固定空白工作目錄、`codex exec --sandbox read-only --ephemeral`、stdin 與 JSON output schema。`CODEX_API_KEY` 只會注入單一 `codex exec` 子程序，不會寫入檔案或 API response。
+Codex 模型是後端 allowlist 的唯一值；request 無法傳入模型或 CLI 參數。每次呼叫均使用固定空白工作目錄、`codex exec --sandbox read-only --ephemeral`、stdin 與 JSON output schema。若設定 `CODEX_API_KEY`，它只會注入單一 `codex exec` 子程序，不會寫入檔案或 API response；未設定時，CLI 會使用該服務帳號既有的 Codex 登入狀態。
 
 正式上課前，請以部署環境的 secret store 注入 key，將 Prompt Coach Provider 改為 `codex`，再呼叫 `/health` 及用一個非敏感測試 Prompt 驗證模型可用性。建議將服務放在反向代理或 Cloudflare Tunnel 後方，僅以固定 HTTPS 網域供 GitHub Pages 前端存取。

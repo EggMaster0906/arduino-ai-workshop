@@ -52,8 +52,8 @@ describe("Provider safety and resource controls", () => {
     expect(() => loadConfig({ CODEX_MODEL: "another-model" })).toThrow("環境變數設定無效");
   });
 
-  it("requires a deployment-injected API key before Codex Provider can start", () => {
-    expect(() => loadConfig({ AI_PROVIDER: "codex" })).toThrow("CODEX_API_KEY");
+  it("permits Codex CLI's existing login when no API key is injected", () => {
+    expect(loadConfig({ AI_PROVIDER: "codex" }).providers.promptCoach).toBe("codex");
   });
 
   it("rejects a second AI operation when concurrency capacity is full", async () => {

@@ -69,7 +69,7 @@ Backend 請從 `apps/api/.env.example` 建立自己的 `.env`。第一版模型�
 CODEX_MODEL=gpt-5.4-mini
 ```
 
-`CODEX_API_KEY` 只能存在 Backend 執行環境，不得提交到 Git、放入前端或輸出到 log。
+`CODEX_API_KEY` 若使用，僅能存在 Backend 執行環境，不得提交到 Git、放入前端或輸出到 log。本機已完成 `codex login` 時，Backend 可使用該登入狀態而不設定 API key；部署環境則建議由 secret store 注入 API key。
 
 ## 驗證
 

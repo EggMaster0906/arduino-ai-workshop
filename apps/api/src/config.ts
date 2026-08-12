@@ -78,10 +78,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
     promptCoach: value.PROMPT_COACH_PROVIDER ?? value.AI_PROVIDER
   };
 
-  if (providers.promptCoach === "codex" && !value.CODEX_API_KEY) {
-    throw new Error("使用 Codex Provider 時必須由部署環境注入 CODEX_API_KEY。");
-  }
-
   return {
     port: value.PORT,
     nodeEnv: value.NODE_ENV,

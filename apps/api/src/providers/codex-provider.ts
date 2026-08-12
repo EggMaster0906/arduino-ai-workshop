@@ -55,7 +55,7 @@ export class NodeExecFileRunner implements CommandRunner {
 
 export interface CodexProviderOptions {
   model: string;
-  apiKey: string;
+  apiKey?: string;
   workdir: string;
   timeoutMs: number;
   executable?: string;
@@ -117,7 +117,8 @@ export class CodexProvider implements AIProvider {
       env: {
         PATH: process.env.PATH ?? "",
         HOME: process.env.HOME ?? "",
-        CODEX_API_KEY: this.options.apiKey,
+        ...(process.env.CODEX_HOME ? { CODEX_HOME: process.env.CODEX_HOME } : {}),
+        ...(this.options.apiKey ? { CODEX_API_KEY: this.options.apiKey } : {}),
         RUST_LOG: "error"
       },
       timeoutMs: this.options.timeoutMs,
